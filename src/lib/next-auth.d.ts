@@ -3,11 +3,10 @@ import "next-auth/jwt";
 
 declare module "next-auth" {
   interface Session {
-    user: {
+    user:  DefaultUser & {
       id: number;
       firstName: string;
       username: string;
-      meow:string
     };
 
     backendTokens: {
