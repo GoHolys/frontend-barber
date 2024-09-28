@@ -7,14 +7,12 @@ interface TableDeleteButtonProps {
   appointmentId: number;
 }
 
-export default function TableEditButton({
+export default function TableViewRecordButton({
   appointmentId,
 }: TableDeleteButtonProps) {
   return (
-    <button
-      className="text-blue-500 hover:text-blue-700 mr-2"
-    >
-      <Link href={`/appointment/edit/${appointmentId}`}>Edit</Link>
+    <button className="text-green-500 hover:text-green-700 mr-2">
+      <Link href={`/appointment/${appointmentId}`}>View Record</Link>
     </button>
   );
 }

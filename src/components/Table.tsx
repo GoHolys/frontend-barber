@@ -1,5 +1,6 @@
 import React from "react";
 import ActionsComponent from "./ActionsComponent";
+import { Appointment } from "@/app/page";
 
 interface Column<T> {
   header: string;
@@ -10,11 +11,11 @@ interface Column<T> {
 interface TableProps<T> {
   data: T[];
   columns: Column<T>[];
-  handleEdit: (id: number) => void;
-  handleDelete: (id: number) => void;
+
+  handleDelete: (id: number) => Promise<void>;
 }
 
-function Table<T>({ data, columns, handleDelete, handleEdit }: TableProps<T>) {
+function Table<T>({ data, columns, handleDelete }: TableProps<T>) {
   return (
     <div className="overflow-x-auto bg-white shadow-md rounded-lg">
       <table className="min-w-full leading-normal">
@@ -43,10 +44,8 @@ function Table<T>({ data, columns, handleDelete, handleEdit }: TableProps<T>) {
                       {column.header === "Actions" ? (
                         <>
                           <ActionsComponent
-                            appointmentId={item.id}
-                            userId={item.userId}
+                            item={item as Appointment}
                             handleDelete={handleDelete}
-                            handleEdit={handleEdit}
                           />
                         </>
                       ) : (

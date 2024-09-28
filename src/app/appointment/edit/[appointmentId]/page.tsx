@@ -1,5 +1,5 @@
 import AppointmentForm from "@/components/forms/AppointmentForm";
-import { editAppointmentAction } from "../../actions/appointments/appointment";
+import { editAppointmentAction } from "../../../actions/appointments/appointment";
 
 export default function EditAppointment({
   params,

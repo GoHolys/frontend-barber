@@ -3,8 +3,9 @@
 import { auth } from "@/auth";
 import { axiosInstance } from "@/axiosInstance";
 import { convertZodErrors } from "@/errors/utils";
-import { createAppointmentSchema } from "./schema";
+import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
+import { createAppointmentSchema, filterAppointmentSchema } from "./schema";
 
 type Methods = "put" | "post" | "patch" | "delete" | "get";
 
@@ -18,6 +19,8 @@ export const appointmentAction = async (
     date: formData.get("date"),
   };
 
+  console.log(unvalidatedData);
+
   const session = await auth();
 
   const validated = createAppointmentSchema.safeParse(unvalidatedData);
@@ -28,9 +31,8 @@ export const appointmentAction = async (
   }
   try {
     const formattedDate = new Date(
-      `${validated.data.date.toString().slice(0, 19)}${validated.data.time}Z`
+      `${validated.data.date.toString().slice(0, 19)}${validated.data.time}`
     ).toISOString();
-    console.log(formattedDate);
     await axiosInstance[httpMethod](endpoint, {
       time: formattedDate,
       userId: session?.user.id,
@@ -55,14 +57,39 @@ export const editAppointmentAction = async (
   prevState: unknown,
   formData: FormData
 ) => {
-  const result = await appointmentAction(
+  const response = await appointmentAction(
     formData,
     `/appointment/${appointmentId}`,
     "patch"
   );
-  return result;
+  return response;
 };
 
 export const deleteAppointmentAction = async (appointmentId: number) => {
   await axiosInstance.delete(`/appointment/${appointmentId}`);
+};
+
+export const filterAppointmentAction = async (
+  prevState: unknown,
+  formData: FormData
+) => {
+  const unvalidatedData = {
+    time: formData.get("date"),
+    firstName: formData.get("firstName"),
+  };
+
+  const validated = filterAppointmentSchema.safeParse(unvalidatedData);
+
+  if (!validated.success) {
+    const errors = convertZodErrors(validated.error);
+    return { errors };
+  }
+  const formattedDate =
+    validated.data.time && new Date(validated.data.time).toISOString();
+  revalidatePath("/");
+  redirect(
+    `/?firstName=${encodeURIComponent(
+      validated.data.firstName
+    )}&time=${encodeURIComponent(formattedDate)}`
+  );
 };

@@ -1,7 +1,6 @@
 "use client";
 
 import { StringMap } from "@/app/types/deal";
-import React, { useRef } from "react";
 import { useFormState } from "react-dom";
 
 interface AppointmentFormProps {
@@ -31,6 +30,8 @@ export default function AppointmentForm({
     undefined
   );
 
+  console.log(serverState);
+
   return (
     <div className="flex justify-center mt-10 w-full ">
       <form
@@ -50,10 +51,8 @@ export default function AppointmentForm({
             name="date"
             type="date"
           />
-          {serverState?.errors?.time && (
-            <small className="text-red-500">
-              {serverState?.errors?.message}
-            </small>
+          {serverState?.errors?.date && (
+            <small className="text-red-500">{serverState?.errors?.date}</small>
           )}
         </div>
         <div className="mb-6">
@@ -69,6 +68,9 @@ export default function AppointmentForm({
             name="time"
             type="time"
           />
+          {serverState?.errors?.time && (
+            <small className="text-red-500">{serverState?.errors?.time}</small>
+          )}
         </div>
         <div className="flex items-center justify-center">
           <button

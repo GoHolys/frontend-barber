@@ -7,6 +7,7 @@ declare module "next-auth" {
       id: number;
       firstName: string;
       username: string;
+      meow:string
     };
 
     backendTokens: {

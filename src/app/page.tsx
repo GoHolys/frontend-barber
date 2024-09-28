@@ -1,15 +1,18 @@
-import React from "react";
-import axios from "axios";
+import FilterSection from "@/components/FilterSection";
 import Table from "@/components/Table";
-import Link from "next/link";
-import { redirect } from "next/navigation";
-import { deleteAppointmentAction } from "./actions/appointments/appointment";
+import axios from "axios";
 import { revalidatePath } from "next/cache";
+import Link from "next/link";
+import React from "react";
+import { deleteAppointmentAction } from "./actions/appointments/appointment";
 
-interface Appointment {
+export interface Appointment {
   id: number;
-  firstName: string;
   time: string;
+  createdAt: string;
+  updatedAt: string;
+  userId: number;
+  firstName: string;
 }
 
 interface Column<T> {
@@ -29,10 +32,19 @@ const columns: Column<Appointment>[] = [
   { header: "Actions", accessor: "firstName" },
 ];
 
-async function getUserData() {
+const handleDelete = async (id: number) => {
+  "use server";
+  await deleteAppointmentAction(id);
+  revalidatePath("");
+};
+
+async function getAppointments(searchParams: Record<string, string>) {
   try {
-    const response = await axios.get<Appointment[]>(
-      "http://www.localhost:8000/appointment"
+    const response = await axios.get(
+      `${process.env.BACKEND_URL}/appointment/filter`,
+      {
+        params: searchParams,
+      }
     );
     return response.data;
   } catch (error) {
@@ -41,35 +53,28 @@ async function getUserData() {
   }
 }
 
-const handleEdit = async (id: number) => {
-  "use server";
-  redirect(`/edit-appointment/${id}`);
-};
-
-const handleDelete = async (id: number) => {
-  "use server";
-  await deleteAppointmentAction(id);
-  revalidatePath("");
-};
-
-export default async function UserTable() {
-  const users = await getUserData();
+export default async function Appointments({
+  searchParams,
+}: {
+  searchParams: Record<string, string>;
+}) {
+  const appointments = await getAppointments(searchParams);
 
   return (
     <div className="flex flex-col items-center">
       <div className="flex mt-5 gap-x-5 justify-center items-center">
         <h1 className="text-2xl">Dog Barber Appointment List</h1>
-        <Link href="/add-appointment">
+        <Link href="/appointment/add">
           <button className="bg-blue-500 hover:bg-blue-600 text-white font-semibold py-1 px-4 rounded-lg shadow-md transition duration-300 ease-in-out">
             Add appointment
           </button>
         </Link>
       </div>
-      <div className="w-full max-w-4xl mt-10">
+      <FilterSection />
+      <div className="w-full max-w-4xl mt-10 mx-auto">
         <Table
-          data={users}
+          data={appointments}
           columns={columns}
-          handleEdit={handleEdit}
           handleDelete={handleDelete}
         />
       </div>
