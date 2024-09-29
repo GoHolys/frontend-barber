@@ -30,7 +30,6 @@ export default function AppointmentForm({
     undefined
   );
 
-  console.log(serverState);
 
   return (
     <div className="flex justify-center mt-10 w-full ">

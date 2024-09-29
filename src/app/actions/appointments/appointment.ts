@@ -19,7 +19,6 @@ export const appointmentAction = async (
     date: formData.get("date"),
   };
 
-  console.log(unvalidatedData);
 
   const session = await auth();
 
@@ -35,7 +34,6 @@ export const appointmentAction = async (
         validated.data.time
       }:00`
     ).toISOString();
-    console.log(formattedDate);
     await axiosInstance[httpMethod](endpoint, {
       time: formattedDate,
       userId: session?.user.id,
