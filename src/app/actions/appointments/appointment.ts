@@ -31,8 +31,11 @@ export const appointmentAction = async (
   }
   try {
     const formattedDate = new Date(
-      `${validated.data.date.toString().slice(0, 19)}${validated.data.time}`
+      `${validated.data.date.toISOString().split("T")[0]}T${
+        validated.data.time
+      }:00`
     ).toISOString();
+    console.log(formattedDate);
     await axiosInstance[httpMethod](endpoint, {
       time: formattedDate,
       userId: session?.user.id,
@@ -66,7 +69,11 @@ export const editAppointmentAction = async (
 };
 
 export const deleteAppointmentAction = async (appointmentId: number) => {
-  await axiosInstance.delete(`/appointment/${appointmentId}`);
+  try {
+    await axiosInstance.delete(`/appointment/${appointmentId}`);
+  } catch (err) {
+    console.log(err);
+  }
 };
 
 export const filterAppointmentAction = async (
